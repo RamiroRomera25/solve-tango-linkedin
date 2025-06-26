@@ -5,7 +5,7 @@ import numpy as np
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 folder = "dark"
 TEMPLATE_PATH = os.path.join(BASE_DIR, "images", folder)
-ENTRADA_PATH = os.path.join(BASE_DIR, "images", "image.PNG")
+ENTRADA_PATH = os.path.join(BASE_DIR, "images", "template_dark.PNG")
 
 # Cargar templates
 templates = {
@@ -82,6 +82,8 @@ def main():
         matriz_resultado.append(fila)
     for fila in matriz_resultado:
         print(fila)
+
+    print(matriz_resultado)
 
 
 
