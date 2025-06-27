@@ -8,14 +8,14 @@ folderSigns = "signs"
 TEMPLATE_PATH = os.path.join(BASE_DIR, "images", folder)
 SIGN_PATH = os.path.join(BASE_DIR, "images", folderSigns)
 
-ENTRADA_PATH = os.path.join(BASE_DIR, "images", "test.PNG")
+ENTRADA_PATH = os.path.join(BASE_DIR, "images", "template_dark_1.PNG")
 
 # Cargar templates
 templates = {
     0: cv2.imread(os.path.join(TEMPLATE_PATH, "empty.PNG"), cv2.IMREAD_COLOR), #uso el IMREAD_COLOR para que no se convierta a escala de grises
     1: cv2.imread(os.path.join(TEMPLATE_PATH, "sol.PNG"), cv2.IMREAD_COLOR),
     2: cv2.imread(os.path.join(TEMPLATE_PATH, "luna.PNG"), cv2.IMREAD_COLOR),
-    3: cv2.imread(os.path.join(SIGN_PATH, "multiply1.PNG"), cv2.IMREAD_COLOR),
+    3: cv2.imread(os.path.join(SIGN_PATH, "multiply.PNG"), cv2.IMREAD_COLOR),
     4: cv2.imread(os.path.join(SIGN_PATH, "equal.PNG"), cv2.IMREAD_COLOR),
 }
 
@@ -35,7 +35,7 @@ cell_h = image.shape[0] // rows
 cell_w = image.shape[1] // cols
 
 
-def es_celda_vacia(celda, umbral=0.7):
+def es_celda_vacia(celda, umbral=0.8):
     template = templates[0]
     template_resized = cv2.resize(template, (celda.shape[1], celda.shape[0]))
     # Convertir ambos a escala de grises
@@ -43,14 +43,15 @@ def es_celda_vacia(celda, umbral=0.7):
     template_gray = cv2.cvtColor(template_resized, cv2.COLOR_BGR2GRAY)
     res = cv2.matchTemplate(celda_gray, template_gray, cv2.TM_CCOEFF_NORMED)
     _, score, _, _ = cv2.minMaxLoc(res)
-    print(f"Score de coincidencia para celda vacía: {score:.2f}")
     return score >= umbral
-def detectar_signo(franja, template, umbral=0.6):
+def detectar_signo(franja, template, umbral=0.2):
     template_resized = cv2.resize(template, (franja.shape[1], franja.shape[0]))
     franja_gray = cv2.cvtColor(franja, cv2.COLOR_BGR2GRAY)
     template_gray = cv2.cvtColor(template_resized, cv2.COLOR_BGR2GRAY)
     res = cv2.matchTemplate(franja_gray, template_gray, cv2.TM_CCOEFF_NORMED)
+    print(f"Score de coincidencia para signo: {np.max(res):.2f}")
     _, score, _, _ = cv2.minMaxLoc(res)
+    print(f"Score de coincidencia para signo: {score >= umbral}")
     return score >= umbral
 
 def detectar_icono(celda, umbral=0.6):
@@ -109,17 +110,17 @@ def main():
             x2 = x_centro + ancho // 2
             franja = image[y1:y2, x1:x2]
 
-            # Debug visual
-            if i==3 and j==0:
-                cv2.imshow(f"Franja H [{i},{j}]", franja)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+            # # Debug visual
+            # if i==3 and j==0:
+            # cv2.imshow(f"Franja H [{i},{j}]", franja)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
             
 
             signo = None
             if 4 in templates and detectar_signo(franja, templates[4], 0.5):
                 signo = "="
-            elif 3 in templates and detectar_signo(franja, templates[3], 0.5):
+            elif 3 in templates and detectar_signo(franja, templates[3], 0.4):
                 signo = "x"
             fila_signos.append(signo)
         matriz_signos_h.append(fila_signos)
@@ -138,11 +139,11 @@ def main():
             y2 = y_centro + alto // 2
             franja = image[y1:y2, x1:x2]
 
-            # Debug visual
-            if i==2 and j==4:
-                cv2.imshow(f"Franja H [{i},{j}]", franja)
-                cv2.waitKey(0)
-                cv2.destroyAllWindows()
+            # # Debug visual
+            # if i==2 and j==4:
+            #     cv2.imshow(f"Franja H [{i},{j}]", franja)
+            #     cv2.waitKey(0)
+            #     cv2.destroyAllWindows()
 
             signo = None
             if 4 in templates and detectar_signo(franja, templates[4], 0.5):
