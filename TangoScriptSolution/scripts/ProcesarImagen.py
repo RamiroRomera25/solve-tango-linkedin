@@ -8,8 +8,8 @@ folderSigns = "signs"
 TEMPLATE_PATH = os.path.join(BASE_DIR, "images", folder)
 SIGN_PATH = os.path.join(BASE_DIR, "images", folderSigns)
 
-ENTRADA_PATH = os.path.join(BASE_DIR, "images", "template_dark_1.PNG")
-
+ENTRADA_PATH = os.path.join(BASE_DIR, "images", "tango.PNG")
+print(f"Ruta de entrada: {ENTRADA_PATH}")
 # Cargar templates
 templates = {
     0: cv2.imread(os.path.join(TEMPLATE_PATH, "empty.PNG"), cv2.IMREAD_COLOR), #uso el IMREAD_COLOR para que no se convierta a escala de grises
@@ -24,16 +24,6 @@ for key, tpl in templates.items():
     if tpl is None:
         print(f"Template {key} no se pudo cargar")
         exit(1)
-
-image = cv2.imread(ENTRADA_PATH,  cv2.IMREAD_COLOR)
-if image is None:
-    print("❌ Imagen principal no se pudo cargar")
-    exit(1)
-
-rows, cols = 6, 6
-cell_h = image.shape[0] // rows
-cell_w = image.shape[1] // cols
-
 
 def es_celda_vacia(celda, umbral=0.8):
     template = templates[0]
@@ -74,7 +64,10 @@ def detectar_icono(celda, umbral=0.6):
 
         res = cv2.matchTemplate(celda_recortada, tpl_resized, cv2.TM_CCOEFF_NORMED)
         _, score, _, _ = cv2.minMaxLoc(res)
-
+        # cv2.imshow("Franja", celda_recortada)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+            
         if score > max_score:
             max_score = score
             mejor_id = tipo_id
@@ -83,6 +76,17 @@ def detectar_icono(celda, umbral=0.6):
 matriz_resultado = []
 
 def main():
+    global image, cell_h, cell_w
+    image = cv2.imread(ENTRADA_PATH,  cv2.IMREAD_COLOR)
+    if image is None:
+        print("❌ Imagen principal no se pudo cargar")
+        exit(1)
+
+    rows, cols = 6, 6
+    cell_h = image.shape[0] // rows
+    cell_w = image.shape[1] // cols
+
+    matriz_resultado = []
     for i in range(rows):
         fila = []
         for j in range(cols):
@@ -110,17 +114,19 @@ def main():
             x2 = x_centro + ancho // 2
             franja = image[y1:y2, x1:x2]
 
-            # # Debug visual
-            # if i==3 and j==0:
-            # cv2.imshow(f"Franja H [{i},{j}]", franja)
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
+           
             
 
             signo = None
-            if 4 in templates and detectar_signo(franja, templates[4], 0.5):
+            if 4 in templates and detectar_signo(franja, templates[4], 0.4):
+                # cv2.imshow(f"Franja H [{i},{j}]", franja)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
                 signo = "="
             elif 3 in templates and detectar_signo(franja, templates[3], 0.4):
+                # cv2.imshow(f"Franja H [{i},{j}]", franja)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
                 signo = "x"
             fila_signos.append(signo)
         matriz_signos_h.append(fila_signos)
@@ -140,15 +146,21 @@ def main():
             franja = image[y1:y2, x1:x2]
 
             # # Debug visual
-            # if i==2 and j==4:
-            #     cv2.imshow(f"Franja H [{i},{j}]", franja)
-            #     cv2.waitKey(0)
-            #     cv2.destroyAllWindows()
+            if i==2 and j==4:
+                cv2.imshow(f"Franja H [{i},{j}]", franja)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
 
             signo = None
-            if 4 in templates and detectar_signo(franja, templates[4], 0.5):
+            if 4 in templates and detectar_signo(franja, templates[4], 0.4):
+                # cv2.imshow(f"Franja H [{i},{j}]", franja)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
                 signo = "="
-            elif 3 in templates and detectar_signo(franja, templates[3], 0.5):
+            elif 3 in templates and detectar_signo(franja, templates[3], 0.4):
+                # cv2.imshow(f"Franja H [{i},{j}]", franja)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
                 signo = "x"
             fila_signos.append(signo)
         matriz_signos_v.append(fila_signos)
